@@ -3,24 +3,6 @@ import java.util.Scanner;
 class program2 {
 
    public static void main(String[] args) {
-      /*
-         Write a program to predict population growth.  For example, let's assume we have a bunny farm 
-         and we want to calculate how fast our herd of bunnies is growing. 
-
-         First, ask the user for the number of bunnies that the farm can comfortably support.  
-         (This is the 'carrying capacity' of the farm; above that number, bunnies start dying from overcrowding.)
-         Then your  program will be able answer both of the following kinds of questions:
-               (1)  How many bunnies will I have after this many months?
-               (2)  How many months will I have to wait to get this many bunnies?
-         Let the user choose which one to answer.  
-         Then ask the user for the information necessary to answer the question.  
-         After answering each question, ask the user whether they want to ask another question 
-         for that farm (with the same carrying capacity).  
-         If they want to ask another question, then ask for all the information again (except for the carrying capacity).  
-         When they are done asking questions about that farm, ask the user if they want to try another farm.  
-         If they do, then ask them for the carrying capacity and repeat the whole process for any number of farms.  
-         Otherwise, stop the program
-      */
 
       int capacity = 0;
       int initialPop = 0;
@@ -32,50 +14,120 @@ class program2 {
       double deathRate;
 
       boolean displayTable = false;
+      boolean doAnotherFarm = true;
+      boolean askAnotherQuestion = true;
 
       Scanner kb = new Scanner(System.in);
+      String tableAnswer = "";
 
-      System.out.println("Bunny Farm Calculator: Determine a Bunny farm population on capacity, death rate, birth rate,");
-      System.out.println("and an initial population.");
-      System.out.println();
-      System.out.println("Additonaly determines the amount of time to reach a given population.");
+      logger("Bunny Farm Calculator: Determine " + 
+         "a Bunny farm population on capacity, death rate, birth rate,", true);
+      logger("and an initial population.", true);
+      logger("Additonaly determines the amount of time to reach "  
+         + "a given population.", true);
+      logger("", true);
+
+      // need to create a while loop to allow the user to ask a question more than once, but with the same farm
+      // but also need to give the user the ability to create a new far
+
       
-      // determine farm capacity
-      System.out.println("Please enter the capacity for your dream Bunny Farm: ");
-      capacity = kb.nextInt();
-      // determine which question the user would like answered
-      System.out.println("Please select which question you would like answered (Enter 1 or 2).");
-      // question 1) How many bunnies  will I have after this many months
-      System.out.println("1) How many bunnies will I have after this many months?");
+      while(doAnotherFarm){
+         // determine farm capacity
+         logger("Please enter the capacity for your dream Bunny Farm: ", false);
+         capacity = kb.nextInt();
+         logger("", true);
 
-      // question 2) How many months will I have to wait to get this many bunnies
-      System.out.println("2) How many months will I have to wait to get this many bunnies?");
+         while(askAnotherQuestion) {
+            // determine which question the user would like answered
+            logger("Please select which question you would like " 
+               + "answered (Enter 1 or 2).", true);
+            // question 1) How many bunnies  will I have after this many months
+            logger("    1) How many bunnies will I have after this " 
+               +  "many months?", true);
 
-      questionSelected = kb.nextInt();
+            // question 2) How many months will I have to wait to get this many bunnies
+            logger("    2) How many months will I have to wait to " 
+               + "get this many bunnies?", true);
 
-      // dont forget to do error handling and authentication for user input     
+            questionSelected = kb.nextInt();
 
-      System.out.println("Please enter an amount of bunnies you would like your farm to start with: ");
-      initialPop = kb.nextInt();
+            // dont forget to do error handling and authentication for user input     
 
-      System.out.println("Next, please enter a positive number for birth Rate: ");
-      birthRate = kb.nextDouble();
+            logger("Please enter an amount of bunnies you would like " 
+               + "your farm to start with: ", false);
+            initialPop = kb.nextInt();
+
+            logger("Next, please enter a positive number for birth Rate: ", false);
+            birthRate = kb.nextDouble();
       
-      System.out.println("Please enter a positive number between 1 and 0 (1 and 0 inclusive): ");
-      deathRate = kb.nextDouble();
+            logger("Please enter a positive number between 1 and 0 (1 and 0 inclusive): ", false);
+            deathRate = kb.nextDouble();
 
-      double growthRate = birthRate - deathRate;
+            double growthRate = birthRate - deathRate;
       
-      if(questionSelected == 1) {
-         System.out.println("Please enter the months for question 1: ");
-          months = kb.nextInt();
-         System.out.println("Would you like the data printed in a table?");
+            if(questionSelected == 1) {
+               logger("Please enter the months for question 1: ", false);
+               months = kb.nextInt();
+               logger("", true);
+               kb.nextLine();
 
-         System.out.println(popForGivenMonths(months, capacity,growthRate, initialPop));
-      } else {
-         System.out.println("Please enter the desired population for question 2: ");
-         desiredPopulation = kb.nextInt();
-         monthsForGivenPop(desiredPopulation, initialPop, growthRate, capacity);
+               logger("Would you like the data printed in a table? ", true);
+
+               tableAnswer = kb.nextLine().toLowerCase();
+         
+               if(tableAnswer.equals("yes") || tableAnswer.equals("y")) {
+                  displayTable = true;
+                  popForGivenMonths(
+                     months, 
+                     capacity, 
+                     growthRate, 
+                     initialPop, 
+                     displayTable
+                  );
+               } else {
+                  popForGivenMonths(
+                     months, 
+                     capacity,
+                     growthRate, 
+                     initialPop, 
+                     displayTable
+                  );
+               }
+         
+            } else {
+               logger("Please enter the desired population " 
+                  + "for question 2: ", true);
+               desiredPopulation = kb.nextInt();
+               monthsForGivenPop(
+                  desiredPopulation, 
+                  initialPop, 
+                  growthRate, 
+                  capacity
+               );
+            }
+
+            logger("Would you like to ask another question for this farm? ", true);
+            kb.nextLine();
+
+            String answerForAnother = "";
+            answerForAnother = kb.nextLine();
+
+            logger(answerForAnother, true);
+
+            if(!answerForAnother.equals("y") || !answerForAnother.equals("yes")) {
+               askAnotherQuestion = false;
+            }
+         }
+
+         logger("Would you like to do another Farm?", true);
+         kb.nextLine();
+
+         String answerForAnotherFarm = "";
+         answerForAnotherFarm = kb.nextLine();
+
+         if(!answerForAnotherFarm.equals("y") || !answerForAnotherFarm.equals("yes")) {
+            doAnotherFarm = false;
+         }
       }
 
       kb.close();
@@ -84,11 +136,22 @@ class program2 {
    // subprogram 1
    // this program will calculate the bunny population
    // after a given period of months
-   public static int popForGivenMonths(int months, int capacity, double growthRate, int currentPop) {
+   public static void popForGivenMonths(
+      int months, 
+      int capacity, 
+      double growthRate, 
+      int currentPop, 
+      boolean displayTable
+   ) 
+   {
       int pNew = 0;
       int pOld = currentPop;
 
-
+      if(displayTable) {
+         logger("---------------", true);
+         logger("| month | Pop |", true);
+         logger("---------------", true);
+      }
       for(int i = 0; i < months; i++) {
 
          // calculate Bold
@@ -99,28 +162,18 @@ class program2 {
 
          pNew = (int)Math.rint(bNew * capacity);
          pOld = pNew;
+
+         logger("| " + (i + 1) + "     | " + pNew + " |", true);
+         logger("---------------", true);
       }
       
-      return pNew;
+      logger("The population after " + months + " is: " + pNew, true);
    }
 
    // subprogram 2
    // this method determines the amount of time required
    // to grow a given amount of bunnied
    public static void monthsForGivenPop(int population, int initialPop, double growthRate, int capacity) {
-      // do stuff
-
-      /*
-         if the equation for monthly pop equation is 
-         Bnew = Bold + gBold(1 - Bold);
-         Bold = Pold / 200
-         g = birthRate - deathRate
-         Pnew = Bnew * 200 
-      */
-
-      // easiest way would be to do above calculation with a counter
-      // for every month just count up one
-      // when the Pnew = population, return the counter
 
       int monthCount = 0;
       int pNew = 0;
@@ -137,15 +190,26 @@ class program2 {
 
          pNew = (int)Math.rint(bNew * capacity);
          pOld = pNew;
-         System.out.println("Pnew " + pNew);
+
          monthCount++;
          // add to monthCount
       }
 
       // return month count
-      System.out.println(monthCount);
+      logger("It would take approximately " 
+         + monthCount + " months.", true);
    }
+
    // subprogram 3
+
+   // subprogram 4
+   public static void logger(String message, boolean nextLine) {
+      if(nextLine) {
+         System.out.println(message);
+      } else {
+         System.out.print(message);
+      }
+   }
 }
 
 /*
