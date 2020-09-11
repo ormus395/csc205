@@ -35,7 +35,18 @@ class program2 {
          // determine farm capacity
          logger("Please enter the capacity for your dream Bunny Farm: ", false);
          capacity = kb.nextInt();
+
+         while(!isPositive(capacity)) {
+            logger("The farms capacity must be a positive number.", true);
+            kb.nextLine();
+            logger("Please enter another number for capacity: ", false);
+
+            capacity = kb.nextInt();
+         }
+
          logger("", true);
+
+         askAnotherQuestion = true;
 
          while(askAnotherQuestion) {
             // determine which question the user would like answered
@@ -51,24 +62,60 @@ class program2 {
 
             questionSelected = kb.nextInt();
 
-            // dont forget to do error handling and authentication for user input     
+            while(questionSelected != 1 && questionSelected != 2) {
+               logger("You did not enter a valid option.", true);
+               logger("Please select which question you would like " 
+                  + "answered (Enter 1 or 2).", true);
+               logger("    1) How many bunnies will I have after this " 
+                  +  "many months?", true);
+               logger("    2) How many months will I have to wait to " 
+                  + "get this many bunnies?", true);
+
+               questionSelected = kb.nextInt();
+            } 
 
             logger("Please enter an amount of bunnies you would like " 
                + "your farm to start with: ", false);
             initialPop = kb.nextInt();
 
-            logger("Next, please enter a positive number for birth Rate: ", false);
+            while(!isPositive(initialPop)) {
+               logger("You can't have negative bunnies silly.", true);
+
+               logger("Please enter an amount of bunnies you would like " 
+                  + "your farm to start with: ", false);
+               initialPop = kb.nextInt();
+            }
+
+            logger("Please enter a positive number for birth Rate: ", false);
             birthRate = kb.nextDouble();
       
-            logger("Please enter a positive number between 1 and 0 (1 and 0 inclusive): ", false);
+            while(!isPositive(birthRate)) {
+               logger("We can't have sterile bunnies...", true);
+
+               logger("Please enter a positive number for birth Rate: ", false);
+               birthRate = kb.nextDouble();
+            }
+
+            logger("Please enter a positive number between 0 and 1: ", false);
             deathRate = kb.nextDouble();
+
+            while(!isPositive(deathRate) || (deathRate > 1)) {
+               logger("Please enter a positive number between 0 and 1: ", false);
+               deathRate = kb.nextDouble();
+            }
 
             double growthRate = birthRate - deathRate;
       
             if(questionSelected == 1) {
                logger("Please enter the months for question 1: ", false);
                months = kb.nextInt();
-               logger("", true);
+               while(!isPositive(months)) {
+                  logger("I'm sorry, but we dont have a time machine.", true);
+
+                  logger("Please enter the months for question 1: ", false);
+                  months = kb.nextInt();
+               }
+            
                kb.nextLine();
 
                logger("Would you like the data printed in a table? ", true);
@@ -98,6 +145,17 @@ class program2 {
                logger("Please enter the desired population " 
                   + "for question 2: ", true);
                desiredPopulation = kb.nextInt();
+
+               while(!isPositive(desiredPopulation) && desiredPopulation < initialPop) {
+                  logger("Please expect more than the starting pop.", true);
+
+                  logger("Please enter the desired population " 
+                     + "for question 2: ", true);
+                  desiredPopulation = kb.nextInt();
+               }
+
+               kb.nextLine();
+
                monthsForGivenPop(
                   desiredPopulation, 
                   initialPop, 
@@ -107,25 +165,25 @@ class program2 {
             }
 
             logger("Would you like to ask another question for this farm? ", true);
-            kb.nextLine();
 
             String answerForAnother = "";
-            answerForAnother = kb.nextLine();
+            answerForAnother = kb.nextLine().toLowerCase();
 
             logger(answerForAnother, true);
 
-            if(!answerForAnother.equals("y") || !answerForAnother.equals("yes")) {
+            if(!answerForAnother.equals("y") && !answerForAnother.equals("yes")) {
                askAnotherQuestion = false;
             }
          }
 
          logger("Would you like to do another Farm?", true);
-         kb.nextLine();
 
          String answerForAnotherFarm = "";
-         answerForAnotherFarm = kb.nextLine();
+         answerForAnotherFarm = kb.nextLine().toLowerCase();
 
-         if(!answerForAnotherFarm.equals("y") || !answerForAnotherFarm.equals("yes")) {
+         logger(answerForAnotherFarm, true);
+
+         if(!answerForAnotherFarm.equals("y") && !answerForAnotherFarm.equals("yes")) {
             doAnotherFarm = false;
          }
       }
@@ -163,32 +221,48 @@ class program2 {
          pNew = (int)Math.rint(bNew * capacity);
          pOld = pNew;
 
-         logger("| " + (i + 1) + "     | " + pNew + " |", true);
-         logger("---------------", true);
+         if(displayTable) {
+            logger("| " + (i + 1) + "     | " + pNew + " |", true);
+            logger("---------------", true);
+         }
+
       }
       
-      logger("The population after " + months + " is: " + pNew, true);
+      logger("The population after " + months + " months is: " + pNew, true);
+      logger("", true);
    }
 
    // subprogram 2
    // this method determines the amount of time required
    // to grow a given amount of bunnied
-   public static void monthsForGivenPop(int population, int initialPop, double growthRate, int capacity) {
+   public static void monthsForGivenPop(
+      int population, 
+      int initialPop, 
+      double growthRate, 
+      int capacity) 
+   {
 
       int monthCount = 0;
       int pNew = 0;
       int pOld = initialPop;
 
-      while(pNew < population) {
+      while(pNew + 1 <= population) {
          // do the month equation
-
+         logger("I am in a loop", true);
          // calculate Bold
          double bOld = (double)pOld / (double)capacity;
+
+         logger("pnew " + pNew, true);
 
          // calculate Bnew
          double bNew = bOld + (growthRate * bOld) * (1.0 - bOld);
 
+         logger("bnew " + bNew, true);
+
          pNew = (int)Math.rint(bNew * capacity);
+
+         logger("pnew again " + pNew, true);
+
          pOld = pNew;
 
          monthCount++;
@@ -196,11 +270,27 @@ class program2 {
       }
 
       // return month count
-      logger("It would take approximately " 
-         + monthCount + " months.", true);
+      logger("It would take approximately " + monthCount + " months.", true);
+      logger("", true);
+      
    }
 
    // subprogram 3
+   /*
+Check every user input for errors: initial population, carrying capacity, and number of months must be positive numbers.  
+The goal population must be greater than or equal to the initial population and less than the carrying capacity.  
+The birth rate must be non-negative (positive or zero).  
+The death rate must be a number between 0 and 1 inclusive (1 and 0 are okay too).  
+Also check every option for a valid entry
+   */
+
+   public static boolean isPositive(int userInput) {
+      return userInput > 0;
+   }
+
+   public static boolean isPositive(double userInput) {
+      return userInput >= 0.0;
+   }
 
    // subprogram 4
    public static void logger(String message, boolean nextLine) {
